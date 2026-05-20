@@ -1,0 +1,40 @@
+AI-Powered OSINT Intelligence Platform on HPC Cluster
+Project Overview:
+
+This project presents a distributed, AI-powered OSINT platform built on an HPC cluster to collect,
+process, and analyze open-source intelligence data for cybersecurity threat detection.
+
+Objectives:
+- Build scalable OSINT system
+- Use HPC (MPI + SLURM)
+- Apply AI for threat detection
+- Integrate IDS logs
+- Provide monitoring dashboard
+
+Core Modules:
+1. OSINT Data Collection
+2. HPC Parallel Processing
+3. AI Engine
+4. Security Intelligence
+5. Monitoring Dashboard
+6. Cloud Integration
+7. Traffic Management
+
+Advanced Features:
+- Threat Intelligence Correlation
+- Explainable AI
+- Attack Graph Visualization
+- Real-time Streaming
+- Automated Response (SOAR)
+- Attack Simulation
+- HPC Benchmarking
+- Zero Trust Security
+
+Demo Flow:
+1. Collect data2. Process via HPC
+3. AI detects threat
+4. Generate alert
+5. Display dashboard
+
+Conclusion:
+This project demonstrates integration of AI, HPC, OSINT, and security into a real-world cyber Intelligence Platform 
