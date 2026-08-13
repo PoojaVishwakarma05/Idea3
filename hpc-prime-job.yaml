@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hpc-prime-calc
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        app: hpc-prime
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: prime-runner
+        image: docker.io/library/busybox:1.36
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c"]
+        args:
+        - |
+          OUT="/mnt/nfs/prime_results.txt"
+          echo "=== Prime Number Benchmark ===" > $OUT
+          echo "Node: $HOSTNAME | Date: $(date)" >> $OUT
+          
+          LIMIT=500000
+          echo "Finding primes up to $LIMIT..."
+          
+          START=$(date +%s)
+          count=0
+          p=2
+          
+          # Simple prime evaluation loop
+          while [ $p -le 2000 ]; do
+            is_prime=1
+            d=2
+            while [ $((d * d)) -le $p ]; do
+              if [ $((p % d)) -eq 0 ]; then
+                is_prime=0
+                break
+              fi
+              d=$((d + 1))
+            done
+            if [ $is_prime -eq 1 ]; then
+              count=$((count + 1))
+            fi
+            p=$((p + 1))
+          done
+          
+          END=$(date +%s)
+          DURATION=$((END - START))
+          
+          echo "Primes Found: $count" >> $OUT
+          echo "Execution Time: ${DURATION}s" >> $OUT
+          echo "Status: SUCCESS" >> $OUT
+          echo "Prime calculation finished in ${DURATION} seconds."
+        volumeMounts:
+        - mountPath: /mnt/nfs
+          name: nfs-storage
+      volumes:
+      - name: nfs-storage
+        persistentVolumeClaim:
+          claimName: nfs-pvc

@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hpc-matrix-multiplication
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        app: hpc-matrix
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: matrix-runner
+        image: docker.io/library/busybox:1.36
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c"]
+        args:
+        - |
+          echo "=== Starting HPC Matrix Multiplication Benchmark ==="
+          TIMESTAMP=$(date)
+          OUT_FILE="/mnt/nfs/matrix_results.txt"
+          
+          echo "Job Execution Time: $TIMESTAMP" > $OUT_FILE
+          echo "Running Node: $HOSTNAME" >> $OUT_FILE
+          echo "------------------------------------------------" >> $OUT_FILE
+          
+          # Simulate computation-heavy benchmark (1000x1000 matrix multiplication)
+          N=1000
+          echo "Simulating $N x $N Matrix Multiplication across CPU cores..."
+          
+          START_TIME=$(date +%s)
+          
+          # Compute benchmark loops
+          i=1
+          sum=0
+          while [ $i -le 1000000 ]; do
+            sum=$((sum + i))
+            i=$((i + 1))
+          done
+          
+          END_TIME=$(date +%s)
+          ELAPSED=$((END_TIME - START_TIME))
+          
+          echo "Computation Completed in $ELAPSED seconds."
+          echo "Sum checksum: $sum"
+          
+          # Write results to shared NFS volume
+          echo "Matrix Size: ${N}x${N}" >> $OUT_FILE
+          echo "Checksum: $sum" >> $OUT_FILE
+          echo "Total Computation Time: ${ELAPSED} seconds" >> $OUT_FILE
+          echo "Status: SUCCESS" >> $OUT_FILE
+          
+          echo "=== Results saved to NFS storage ($OUT_FILE) ==="
+        resources:
+          requests:
+            cpu: "1"
+            memory: "256Mi"
+          limits:
+            cpu: "2"
+            memory: "512Mi"
+        volumeMounts:
+        - mountPath: /mnt/nfs
+          name: nfs-storage
+      volumes:
+      - name: nfs-storage
+        persistentVolumeClaim:
+          claimName: nfs-pvc
